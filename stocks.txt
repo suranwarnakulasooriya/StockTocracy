@@ -1,0 +1,3 @@
+AAPL 2
+TSLA 0
+NVDA 1
