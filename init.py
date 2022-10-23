@@ -2,9 +2,12 @@ import yfinance as yf # get stock information
 import pendulum # parsing stuff from yf
 from numpy.random import normal
 from random import randint, choice
+from datetime import datetime as date
+from pandas import date_range as dr
 
 #import matplotlib.pyplot as plt
-
+today_y = date.today().year; today_m = date.today().month; today_d = date.today().day
+datelist = dr(date(today_y-1,today_m,today_d),date(today_y,today_m,today_d),freq='D')
 # dict that matches symbols to company names
 stock_lookup = {
     'AAPL':'Apple Inc.',
@@ -89,7 +92,7 @@ stock_lookup = {
     'WM':'Waste Management Inc.',
     'ATVI':'Activision Blizzard Inc.',
     'CSX':'CSX Corporation',
-    'UBER':'Uber Technologies',
+    'UBER':'Uber Technologies Inc.',
     'MUFG':'Mitsubishi UFJ',
     'F':'Ford Motor Company',
     'GM':'General Motors Company',
@@ -108,11 +111,34 @@ stock_lookup = {
     'SHOP':'Shopify Inc.',
     'EA':'Electronic Arts Inc.',
     'RACE':'Ferrari',
+    'ZM':'Zoom Video Communications Inc',
+    'NOK':'Nokia Corporation',
+    'SIRI':'Sirius XM Holdings Inc.',
+    'CAJ':'Canon Inc.',
+    'EBAY':'eBay Inc.',
+    'DAL':'Delta Air Lines Inc.',
+    'FRC':'First Republic Bank',
+    'LUV':'Southwest Airlines',
+    'DB':'Deutsche Bank',
+    'SPOT':'Spotify Technologies',
+    'EXPE':'Expedia Group',
+    'MDB':'MongoDB Inc.',
+    'DPZ':"Domino's Pizza Inc."
 }
 
 # split stock_lookup
 stock_symbols = list(stock_lookup.keys())
 stock_names = list(stock_lookup.values())
+
+def get_365_days(price_history):
+    #price_history = yf.Ticker(symbol).history(period='1y',interval='1d',actions=False)
+    L = list(round((price_history['High']+price_history['Low'])/2,2))
+    #del price_history
+    index = 0
+    while len(L) < 365:
+        index -= 3
+        L.insert(index,round((L[index-1]+L[index+1])/2,2))
+    return L
 
 class StockSpectator:
     def __init__(self):
@@ -155,6 +181,14 @@ class StockSpectator:
                 nonzeroes[stock] = source[stock]
         return nonzeroes
         
+    def dummyvote(self,symbol,autovoters:int=4,day:int=1):
+        #self.allstocks[symbol][-day] = randint(0,50)
+        #self.selfstocks[symbol][-day] = randint(0,50)
+        self.allstocks[symbol][-day] = 1
+        self.selfstocks[symbol][-day] = 1
+        self.heldstocks = self.filter_stocks(self.allstocks)
+        self.selfshares = self.filter_stocks(self.selfstocks)
+
     def vote(self,symbol,autovoters:int=4,uservote:int=0,day:int=1,document:bool=False):
         shares = self.allstocks[symbol][-day] # get number of shares
         
@@ -214,20 +248,65 @@ SS = StockSpectator()
 
 #print(SS.selfshares)
 
+#for day in range(1):
+#    for stock in ['AAPL','GOOGL']:
+#        SS.dummyvote(stock,day=day)
+
+#print(SS.heldstocks['AAPL'])
+#print(len(SS.heldstocks['AAPL']))
 #for day in range(100):
 #    for stock in ['AAPL']:#,'GOOGL','TSLA','KO','F','SNY']:
 #        print(day,stock)
 #        SS.vote(stock,choice([2,4,6,8,10,12,14,16,18,20,22,24,26,28]),randint(-50,50),day=day+1,document=False)
+#price_history = yf.Ticker('AAPL').history(period='1d',interval='1d',actions=False)
+#print(list(price_history.index))
+#axis = [datetime.fromtimestamp(pendulum.parse(str(dt)).float_timestamp) for dt in list(price_history.index)]
+#print(axis)
+r = 365
+#print(len(SS.allstocks['AAPL']))
+#SS.allstocks['AAPL'] = [randint(1,1) for _ in range(r)]
+#SS.selfstocks['AAPL'] = [randint(2,2) for _ in range(r)]
+#SS.allstocks['TSLA'] = [randint(1,1) for _ in range(r)]
+#SS.selfstocks['TSLA'] = [randint(2,2) for _ in range(r)]
+#for i in range(r): SS.allstocks['AAPL'][i] = randint(1,1)
+#for i in range(r): SS.selfstocks['AAPL'][i] = randint(2,2)
+for i in range(r): SS.allstocks['TSLA'][i] = 1#randint(1,1)
+for i in range(r): SS.selfstocks['TSLA'][i] = 2#randint(2,2)
+for i in range(r): SS.allstocks['AAPL'][i] = 1#randint(1,1)
+for i in range(r): SS.selfstocks['AAPL'][i] = 2#randint(2,2)
 
+#SS.selfstocks['HD'][0] = 1
+
+SS.heldstocks = SS.filter_stocks(SS.allstocks)
+SS.selfshares = SS.filter_stocks(SS.selfstocks)
+
+#print(SS.allstocks['AAPL'])
 #print(SS.heldstocks)
 #print(SS.selfshares)
+
+
+
+
+
+
+#print(len(bruh))
+#bruh = fill(bruh)
+#print()
+#print(len(bruh))
+
+
+#print(len(bruh))
+#print(price_history['High'])
+#print(price_history['Open'])
+
+#print(price_history)
 
 #print(SS.allstocks['AAPL'])
 #print(SS.selfstocks['AAPL'])
 
 #print(SS.heldstocks['AAPL'][2])
 #print(SS.budget)
-SS.vote(choice(stock_symbols),choice([2,4,6,8,10,12,14,16,18,20,22,24,26]),document=True)
+#SS.vote(choice(stock_symbols),choice([2,4,6,8,10,12,14,16,18,20,22,24,26]),document=True)
 
 #print(SS.allstocks)
 
