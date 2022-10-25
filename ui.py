@@ -8,7 +8,10 @@ import plotly.graph_objects as go
 #import pandas as pd
 #import scipy.stats
 #from colour import Color
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
+from time import sleep
+from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
 #from pandas import date_range as dr
 #import pandas_datareader as web
 #import os
@@ -99,7 +102,7 @@ def get_cumulative(symbols,dic,period:str='1y',interval:str='1d',group:bool=True
             name=symbol,
             stackgroup='one'))
     if group: title = 'Cumulative Value of Group Held Shares'
-    else: title = 'Cumulative Value of Personal Held Shares (Speculative)'
+    else: title = 'Cumulative Value of Personal Held Shares'
     cumul.update_layout(font_size=15,hovermode='x',xaxis_title='Date',yaxis_title='Cumulative Share Value (USD)',title={'text':title,'x':0.5,'xanchor':'center'})
     return cumul
 
@@ -116,25 +119,180 @@ self_cumulative = get_cumulative([stock for stock in SS.selfshares],SS.selfshare
 #        placeholder='Enter how many shares you want to buy, insert a negative to sell.'
 #    )])
 
-flavor_text = html.Div(
-    id='flavor_text',
-    children='No Vote Held Yet'
+flavor_text_1 = html.Div(
+    id='flavortext1',
+    children='No Vote Held Yet')
+    #children='{} <br> B: \nC: {}'.format('vote','held'))
+
+flavor_text_2 = html.Div(
+    id='flavortext2',
+    children='',
+    #style={'display': 'none'}
+    )
+
+flavor_text_3 = html.Div(
+    id='flavortext3',
+    children='',
+    #style={'display':'none'}
 )
+
+modal = html.Div(
+    dbc.Modal(
+            [
+                dbc.ModalHeader("HEADER"),
+                dbc.ModalBody("BODY OF MODAL"),
+                dbc.ModalFooter(
+                    dbc.Button("CLOSE BUTTON", id="close", className="ml-auto")
+                ),
+            ],
+            id="modal",
+        ),
+)
+
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("vote", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1,n2,is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+voter_1 = html.Div(
+    id='voter1',
+    children='')
+voter_2 = html.Div(
+    id='voter2',
+    children='')
+voter_3 = html.Div(
+    id='voter3',
+    children='')
+voter_4 = html.Div(
+    id='voter4',
+    children='')
+voter_5 = html.Div(
+    id='voter5',
+    children='')
+voter_6 = html.Div(
+    id='voter6',
+    children='')
+voter_7 = html.Div(
+    id='voter7',
+    children='')
+voter_8 = html.Div(
+    id='voter8',
+    children='')
+
+
 
 vote_button = html.Div(
     html.Button(
         id='votebutton',
+        style={'font-size':'20px'},
         #style={'width':'100%','height':'100%'},
-        #type='VOTE!'
+        #type='VOTE!',
+        children='VOTE!'
     )
 )
 
-#@app.callback(
-#Output('votebox','children'),
-#[Input('vote','value')])
-#def hold_vote(vote):
-#    return vote
 
+@app.callback(
+Output('flavortext1','children'),
+[Input('votebutton','n_clicks'),Input('cast','value')],prevent_initial_call=True)
+def hold_vote_1(clicks,value):
+    if SS.voted: raise PreventUpdate
+    else:
+        #SS.voted = True
+        #try:
+        #    #print(value)
+        #    if value != None:
+        #        i = int(value)
+        #        SS.uivote(i)
+                #SS.voted = False
+        
+        
+        #except: raise PreventUpdate()
+        return f'Waiting for voters for {SS.current_view}...'
+        
+        
+        
+        
+
+@app.callback(
+Output('flavortext2','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1)
+    if SS.voted: raise PreventUpdate
+    else: return 'Voters with Similar Budgets Found!'
+        #return 'sex\npenis'
+
+'''
+@app.callback(
+Output('voter1','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.05)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 1'
+
+@app.callback(
+Output('voter2','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.10)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 2'
+
+@app.callback(
+Output('voter3','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.15)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 3'
+
+@app.callback(
+Output('voter4','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.20)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 4'
+
+@app.callback(
+Output('voter5','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.25)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 5'
+
+@app.callback(
+Output('voter6','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.30)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 6'
+
+@app.callback(
+Output('voter7','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.35)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 7'
+
+@app.callback(
+Output('voter8','children'),
+[Input('votebutton','n_clicks')],prevent_initial_call=True)
+def hold_vote_2(clicks):
+    sleep(1.40)
+    if SS.voted: raise PreventUpdate
+    else: return 'Vote 8'
+'''
 
 @app.callback(
 Output('current_view_div','children'),
@@ -151,6 +309,10 @@ def update_current_view(symbol):
 #def hold_vote(nc):
 #    return SS.current_view
 
+enter_vote = html.Div(
+    id='entervote',
+    children=dcc.Input(id='cast')
+)
 
 # main loop
 if __name__ == '__main__':
@@ -166,8 +328,22 @@ if __name__ == '__main__':
     
     html.Div(children=dcc.Graph(id='current_view',figure=current_stock_view),id='current_view_div'),
     
-    html.Center(children=flavor_text),
+    modal,
+
+    html.Center(children=flavor_text_1),
+    html.Center(children=flavor_text_2),
+    html.Center(children=voter_1),
+    html.Center(children=voter_2),
+    html.Center(children=voter_3),
+    html.Center(children=voter_4),
+    html.Center(children=voter_5),
+    html.Center(children=voter_6),
+    html.Center(children=voter_7),
+    html.Center(children=voter_8),
+    #html.Center(children=flavor_text_3),
+    html.Center(children=enter_vote),
     html.Center(children=vote_button),
+    #vote_button,
     #html.Center(children=vote_button),
 
     #html.Center(children=html.Div(children=comparitive_view_dropdown,style={'width':'10%'})),

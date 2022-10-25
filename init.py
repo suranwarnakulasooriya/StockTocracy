@@ -146,6 +146,7 @@ class StockSpectator:
         #self.allstocks = dict.fromkeys(stock_lookup,[0 for _ in range(365)]) # dict of all stocks (keys = stock symbols, values = number of shares)
         #self.allstocks = self.load('stocks.txt')
         #self.heldstocks = self.get_stocks()
+        self.lag = 0
         self.allstocks = {}
         self.allstocks = self.load_shares(self.allstocks,'stocks.txt')
         self.heldstocks = self.filter_stocks(self.allstocks)
@@ -153,6 +154,7 @@ class StockSpectator:
         self.selfstocks = {}
         self.selfstocks = self.load_shares(self.selfstocks,'selfshares.txt')
         self.selfshares = self.filter_stocks(self.selfstocks)
+        self.voted = False
 
     #def load(self,filename:str): # load save data
     #    with open(filename,'r') as f: held_stocks = f.read().splitlines() # load
@@ -188,6 +190,9 @@ class StockSpectator:
         self.selfstocks[symbol][-day] = 1
         self.heldstocks = self.filter_stocks(self.allstocks)
         self.selfshares = self.filter_stocks(self.selfstocks)
+
+    def uivote(self,vote,autovoters:int=8):
+        return None
 
     def vote(self,symbol,autovoters:int=4,uservote:int=0,day:int=1,document:bool=False):
         shares = self.allstocks[symbol][-day] # get number of shares
@@ -269,12 +274,25 @@ r = 365
 #SS.allstocks['TSLA'] = [randint(1,1) for _ in range(r)]
 #SS.selfstocks['TSLA'] = [randint(2,2) for _ in range(r)]
 #for i in range(r): SS.allstocks['AAPL'][i] = randint(1,1)
-#for i in range(r): SS.selfstocks['AAPL'][i] = randint(2,2)
+# for i in range(r): SS.selfstocks['AAPL'][i] = randint(2,2)
+
 for i in range(r): SS.allstocks['TSLA'][i] = 1#randint(1,1)
 for i in range(r): SS.selfstocks['TSLA'][i] = 2#randint(2,2)
 for i in range(r): SS.allstocks['AAPL'][i] = 1#randint(1,1)
 for i in range(r): SS.selfstocks['AAPL'][i] = 2#randint(2,2)
 
+
+#print(choice(stock_symbols))
+
+#print(len(stock_symbols))
+'''
+for _ in range(10):
+    stock = choice(stock_symbols)
+        #print(stock)
+    for i in range(randint(1,365)):
+        SS.allstocks[stock][i] = randint(0,50)
+        SS.selfstocks[stock][i] = randint(0,50)
+'''
 #SS.selfstocks['HD'][0] = 1
 
 SS.heldstocks = SS.filter_stocks(SS.allstocks)
