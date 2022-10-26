@@ -121,7 +121,7 @@ self_cumulative = get_cumulative([stock for stock in SS.selfshares],SS.selfshare
 
 flavor_text_1 = html.Div(
     id='flavortext1',
-    children='No Vote Held Yet')
+    children='')
     #children='{} <br> B: \nC: {}'.format('vote','held'))
 
 flavor_text_2 = html.Div(
@@ -136,28 +136,8 @@ flavor_text_3 = html.Div(
     #style={'display':'none'}
 )
 
-modal = html.Div(
-    dbc.Modal(
-            [
-                dbc.ModalHeader("HEADER"),
-                dbc.ModalBody("BODY OF MODAL"),
-                dbc.ModalFooter(
-                    dbc.Button("CLOSE BUTTON", id="close", className="ml-auto")
-                ),
-            ],
-            id="modal",
-        ),
-)
 
-@app.callback(
-    Output("modal", "is_open"),
-    [Input("vote", "n_clicks"), Input("close", "n_clicks")],
-    [State("modal", "is_open")],
-)
-def toggle_modal(n1,n2,is_open):
-    if n1 or n2:
-        return not is_open
-    return is_open
+
 
 voter_1 = html.Div(
     id='voter1',
@@ -203,20 +183,8 @@ Output('flavortext1','children'),
 def hold_vote_1(clicks,value):
     if SS.voted: raise PreventUpdate
     else:
-        #SS.voted = True
-        #try:
-        #    #print(value)
-        #    if value != None:
-        #        i = int(value)
-        #        SS.uivote(i)
-                #SS.voted = False
-        
-        
-        #except: raise PreventUpdate()
+        SS.uivote(value)
         return f'Waiting for voters for {SS.current_view}...'
-        
-        
-        
         
 
 @app.callback(
@@ -225,74 +193,45 @@ Output('flavortext2','children'),
 def hold_vote_2(clicks):
     sleep(1)
     if SS.voted: raise PreventUpdate
-    else: return 'Voters with Similar Budgets Found!'
+    else: 
+        return 'Voters with Similar Budgets Found!'
+        #return SS.uivote(0)
         #return 'sex\npenis'
 
-'''
+
 @app.callback(
 Output('voter1','children'),
 [Input('votebutton','n_clicks')],prevent_initial_call=True)
 def hold_vote_2(clicks):
-    sleep(1.05)
+    sleep(1)
     if SS.voted: raise PreventUpdate
-    else: return 'Vote 1'
+    else: return f'{SS.votes[0][0]} voted {SS.votes[0][1]}      :      {SS.votes[1][0]} voted {SS.votes[1][1]}'
 
 @app.callback(
 Output('voter2','children'),
 [Input('votebutton','n_clicks')],prevent_initial_call=True)
 def hold_vote_2(clicks):
-    sleep(1.10)
+    sleep(1)
     if SS.voted: raise PreventUpdate
-    else: return 'Vote 2'
+    else: return f'{SS.votes[2][0]} voted {SS.votes[2][1]}      :      {SS.votes[3][0]} voted {SS.votes[3][1]}'
 
 @app.callback(
 Output('voter3','children'),
 [Input('votebutton','n_clicks')],prevent_initial_call=True)
 def hold_vote_2(clicks):
-    sleep(1.15)
+    sleep(1)
     if SS.voted: raise PreventUpdate
-    else: return 'Vote 3'
+    else: return f'{SS.votes[4][0]} voted {SS.votes[4][1]}      :      {SS.votes[5][0]} voted {SS.votes[5][1]}'
 
 @app.callback(
 Output('voter4','children'),
 [Input('votebutton','n_clicks')],prevent_initial_call=True)
 def hold_vote_2(clicks):
-    sleep(1.20)
+    sleep(1)
     if SS.voted: raise PreventUpdate
-    else: return 'Vote 4'
+    else: return f'{SS.votes[6][0]} voted {SS.votes[6][1]}      :      {SS.votes[7][0]} voted {SS.votes[7][1]}'
 
-@app.callback(
-Output('voter5','children'),
-[Input('votebutton','n_clicks')],prevent_initial_call=True)
-def hold_vote_2(clicks):
-    sleep(1.25)
-    if SS.voted: raise PreventUpdate
-    else: return 'Vote 5'
 
-@app.callback(
-Output('voter6','children'),
-[Input('votebutton','n_clicks')],prevent_initial_call=True)
-def hold_vote_2(clicks):
-    sleep(1.30)
-    if SS.voted: raise PreventUpdate
-    else: return 'Vote 6'
-
-@app.callback(
-Output('voter7','children'),
-[Input('votebutton','n_clicks')],prevent_initial_call=True)
-def hold_vote_2(clicks):
-    sleep(1.35)
-    if SS.voted: raise PreventUpdate
-    else: return 'Vote 7'
-
-@app.callback(
-Output('voter8','children'),
-[Input('votebutton','n_clicks')],prevent_initial_call=True)
-def hold_vote_2(clicks):
-    sleep(1.40)
-    if SS.voted: raise PreventUpdate
-    else: return 'Vote 8'
-'''
 
 @app.callback(
 Output('current_view_div','children'),
@@ -328,7 +267,7 @@ if __name__ == '__main__':
     
     html.Div(children=dcc.Graph(id='current_view',figure=current_stock_view),id='current_view_div'),
     
-    modal,
+    #modal,
 
     html.Center(children=flavor_text_1),
     html.Center(children=flavor_text_2),
@@ -336,13 +275,16 @@ if __name__ == '__main__':
     html.Center(children=voter_2),
     html.Center(children=voter_3),
     html.Center(children=voter_4),
-    html.Center(children=voter_5),
-    html.Center(children=voter_6),
-    html.Center(children=voter_7),
-    html.Center(children=voter_8),
+    #html.Center(children=voter_5),
+    #html.Center(children=voter_6),
+    #html.Center(children=voter_7),
+    #html.Center(children=voter_8),
     #html.Center(children=flavor_text_3),
     html.Center(children=enter_vote),
     html.Center(children=vote_button),
+
+    
+
     #vote_button,
     #html.Center(children=vote_button),
 

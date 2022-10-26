@@ -155,6 +155,12 @@ class StockSpectator:
         self.selfstocks = self.load_shares(self.selfstocks,'selfshares.txt')
         self.selfshares = self.filter_stocks(self.selfstocks)
         self.voted = False
+        self.votes = []
+        self.toc = 0
+        self.namesb = ['Mason','John','Abby','Phillip','Raj','Rika','Juan-Paul','Yara','Abdul','Giuseppe','Michael','Ria','Margaret','Chloe','Anna','Layla'
+        'Noah','Clark','Fred','Josh','Allison','Rachel','Marcus','Jason','Mahmoud','Sai','Tori','Frederick','Quandale','Alexander','Stanislow','Benjamin',
+        'Tanaka','Trenton','Katherine','Trevor','Rilley','Muhammed','Kawasaki','Kumar','Anura','James','Louis']
+        self.names = self.namesb[:]
 
     #def load(self,filename:str): # load save data
     #    with open(filename,'r') as f: held_stocks = f.read().splitlines() # load
@@ -190,9 +196,54 @@ class StockSpectator:
         self.selfstocks[symbol][-day] = 1
         self.heldstocks = self.filter_stocks(self.allstocks)
         self.selfshares = self.filter_stocks(self.selfstocks)
+        #self.votes = []
 
-    def uivote(self,vote,autovoters:int=8):
-        return None
+    def uivote(self,vote:int=0,autovoters:int=8):
+        price_history = yf.Ticker(self.current_view).history(period='1mo',interval='1d',actions=False)
+    #axis = [datetime.fromtimestamp(pendulum.parse(str(dt)).float_timestamp) for dt in list(price_history.index)]
+    #axis = dr(date(today_y-1,today_m,today_d),date(today_y,today_m,today_d),freq='D')
+        L = list(round((price_history['High']+price_history['Low'])/2,2))
+        #print(L)
+        #check={}
+        shares = self.allstocks[self.current_view][-1]
+        price = L[-1]
+        M = self.budget // price
+        inc = 0
+        dec = 0
+        for i in range(len(L)):
+            try:
+                if L[i] < L[i+1]:
+                    inc += abs(L[i]-L[i+1])
+                    #print(inc)
+                else:
+                    dec += abs(L[i]-L[i+1])
+            except IndexError:
+               #print('d')
+                pass
+        #print(inc,dec)
+        r = inc + dec
+        avg = (inc-dec)/2 
+        #print(-shares)
+        #print(avg,r/10)
+        for _ in range(8):
+            vote = max(-shares,min(M, round(normal(-avg,r/5))))
+            #print(vote)
+            n = randint(0,len(self.names)-1)
+            self.votes.append((self.names[n],vote))
+            self.names.pop(n)
+        
+        self.toc = round((sum(self.votes)+vote)/9)
+        self.names = self.namedb[:]
+        print(self.toc)
+        #print(self.votes)
+        #self.votes = [min(-shares,max(M, round(normal(avg,r/5)))) for _ in range(8)]
+        #check[temp.count('Increasing')] = 1
+        #check[temp.count('Decreasing')] = 0
+        #return self.votes
+        #return None
+
+    #return check[max(check)]
+        #progression = get_365_days(price_history)
 
     def vote(self,symbol,autovoters:int=4,uservote:int=0,day:int=1,document:bool=False):
         shares = self.allstocks[symbol][-day] # get number of shares
@@ -278,7 +329,7 @@ r = 365
 
 for i in range(r): SS.allstocks['TSLA'][i] = 1#randint(1,1)
 for i in range(r): SS.selfstocks['TSLA'][i] = 2#randint(2,2)
-for i in range(r): SS.allstocks['AAPL'][i] = 1#randint(1,1)
+for i in range(r): SS.allstocks['AAPL'][i] = 10#randint(1,1)
 for i in range(r): SS.selfstocks['AAPL'][i] = 2#randint(2,2)
 
 
@@ -297,6 +348,9 @@ for _ in range(10):
 
 SS.heldstocks = SS.filter_stocks(SS.allstocks)
 SS.selfshares = SS.filter_stocks(SS.selfstocks)
+
+#print(SS.current_view)
+#print(SS.uivote(0))
 
 #print(SS.allstocks['AAPL'])
 #print(SS.heldstocks)
