@@ -262,6 +262,10 @@ class StockSpectator:
         self.budget -= self.toc*price
         self.budget = round(self.budget,2)
         self.allstocks[self.current_view][-1] = self.toc
+        shares = self.selfstocks[self.current_view][-1]
+        #price = L[-1]
+        M = self.sbudg // price
+        self.vote = max(-shares,min(M,self.vote))
         self.selfstocks[self.current_view][-1] = self.vote
         self.heldstocks = self.filter_stocks(self.allstocks)
         self.selfshares = self.filter_stocks(self.selfstocks)
@@ -270,7 +274,7 @@ class StockSpectator:
         self.hist.append(self.vote-self.toc)
 
     def demo(self):
-        S = randint(2,15)
+        S = randint(5,20)
         mu = randint(-10,10)
         sig = randint(5,20)
         self.budget = round(uniform(10_000,1_000_000),2)

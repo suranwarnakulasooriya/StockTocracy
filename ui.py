@@ -57,38 +57,23 @@ def get_cumulative(symbols,dic,period:str='1y',interval:str='1d',group:bool=True
     progressions = []
     cumul = go.Figure()
     for i,symbol in enumerate(symbols):
-        #print(symbol)i sdfoisbandfoiabsdfoiabsd
         price_history = yf.Ticker(symbol).history(period=period,interval=interval,actions=False)
-        #progression = list((price_history['High']+price_history['Low'])/2) # average of high and low
-        #progression = [randint(140,190) for _ in range(364)]
-        #print(len(progression))
         progression = get_365_days(price_history)
-        #progression = [round(e*p,2) for e,p in enumerate(progression)]
-        
-        #line = []
         line = [round(dic[symbol][i] * e,2) for i,e in enumerate(progression)]
-        #for i,e in enumerate(progression):
-        #    print(dic[symbol][i],end = ' ')
-        #    line.append(round(dic[symbol][i] * e,2))
-        #print()
-        
-        #print(progression)
-        #if i == 0: axis = [datetime.fromtimestamp(pendulum.parse(str(dt)).float_timestamp) for dt in list(price_history.index)]
-        
         cumul.add_trace(go.Scatter(
             x=datelist,
             y=line,
             name=symbol,
             stackgroup='one'))
     if group: title = 'Cumulative Value of Group Held Shares'
-    else: title = 'Cumulative Value of Personal Held Shares'
+    else: title = 'Cumulative Value of Personal Held Shares (Share number clamps to possible values)'
     cumul.update_layout(font_size=15,hovermode='x',xaxis_title='Date',yaxis_title='Cumulative Share Value (USD)',title={'text':title,'x':0.5,'xanchor':'center'})
     return cumul
 
 cumulative_view = get_cumulative([stock for stock in SS.heldstocks],SS.allstocks)
 self_cumulative = get_cumulative([stock for stock in SS.selfshares],SS.selfshares,group=False)
 
-flavor_text_1 = html.Div(id='flavortext1',children='')
+flavor_text_1 = html.Div(id='flavortext1',children=f'You have {SS.allstocks[SS.current_view][-1]} shares of {SS.current_view}.')
 flavor_text_2 = html.Div(id='flavortext2',children='')
 
 voter_1 = html.Div(id='voter1',children='')
@@ -124,14 +109,15 @@ def update_share_count(up,down,up2,down2,reset):
 
 @app.callback(
 Output('flavortext1','children'),
-[Input('votebutton','n_clicks'),Input('sharecount','children'),Input('current_view_dropdown','value')],prevent_initial_call=True)
+[Input('votebutton','n_clicks'),Input('sharecount','children'),Input('current_view_dropdown','value')])#,prevent_initial_call=True)
 def hold_vote_1(clicks,value,sym):
     clicked = [p['prop_id'] for p in dash.callback_context.triggered][0]
     if 'votebutton.n_clicks' in clicked and SS.symbolvotes[sym] == 0:
         SS.uivote(value)
         SS.symbolvotes[sym] = 1
         return f'Waiting for voters for {SS.current_view}...'
-    elif 'current_view_dropdown' in clicked: return ''
+    elif 'current_view_dropdown' in clicked: return f'You have {SS.allstocks[SS.current_view][-1]} shares of {SS.current_view}.'
+    elif 'sharecount.children' in clicked: return f'You have {SS.allstocks[SS.current_view][-1]} shares of {SS.current_view}.'
     elif SS.symbolvotes[sym] == 1: return 'You already voted on this stock today.'
         
 @app.callback(
@@ -199,11 +185,12 @@ def get_hist():
     r = 1
     try: r = abs(max(SS.hist)-min(SS.hist))
     except: pass
-    fig.add_histogram(x=SS.hist,nbinsx=2*r,histnorm='probability',hoverlabel=None,autobinx=True,hoverinfo=None)
+    fig.add_histogram(x=SS.hist,nbinsx=int(2*r),histnorm='probability',hoverlabel=None,autobinx=True,hoverinfo=None)
     t0 = 0
     try: t0 = -abs(max(SS.hist))
     except: pass
-    fig.update_layout(xaxis=dict(tickmode='linear',tick0=t0,dtick=1),xaxis_title='Shares Off From Group Vote',yaxis_title='Frequency',font_size=15,title={'text':"Your Vote vs The Group's Vote",'x':0.5,'xanchor':'center'})
+    fig.update_layout(xaxis=dict(tickmode='linear',tick0=t0,dtick=1),xaxis_title='Shares Off From Group Vote',yaxis_title='Frequency',font_size=15,
+    title={'text':"Your Vote vs The Group's Vote",'x':0.5,'xanchor':'center'},bargap=0.2)
     return html.Div(dcc.Graph(figure=fig))
 
 hist = get_hist()
